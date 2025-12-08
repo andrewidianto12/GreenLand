@@ -1,0 +1,61 @@
+name: Auto Commit
+
+on:
+  schedule:
+    # Runs every hour
+    - cron: "0 * * * *"
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "andrewidianto12"
+          git config --global user.email "penghijauan@gmail.com"
+
+      - name: Make changes
+        run: |
+          # Add your custom changes here
+          # Example: Update a timestamp file
+          echo "Last updated: $(date)" > LAST_UPDATE.txt
+
+      - name: Commit and push changes
+        run: |
+          HOUR=$(date +'%H')
+          case $HOUR in
+            00) EMOJI="🌙" ;; # Midnight
+            01) EMOJI="🌌" ;; # 1 AM
+            02) EMOJI="💤" ;; # 2 AM
+            03) EMOJI="🦉" ;; # 3 AM
+            04) EMOJI="🌃" ;; # 4 AM
+            05) EMOJI="🌄" ;; # 5 AM
+            06) EMOJI="🌅" ;; # 6 AM - Sunrise
+            07) EMOJI="☕" ;; # 7 AM - Coffee time
+            08) EMOJI="🌞" ;; # 8 AM
+            09) EMOJI="📊" ;; # 9 AM - Work starts
+            10) EMOJI="💼" ;; # 10 AM
+            11) EMOJI="📈" ;; # 11 AM
+            12) EMOJI="🍱" ;; # 12 PM - Lunch
+            13) EMOJI="🌤️" ;; # 1 PM
+            14) EMOJI="💻" ;; # 2 PM
+            15) EMOJI="☕" ;; # 3 PM - Afternoon coffee
+            16) EMOJI="📝" ;; # 4 PM
+            17) EMOJI="🏃" ;; # 5 PM - Going home
+            18) EMOJI="🌆" ;; # 6 PM - Evening
+            19) EMOJI="🍽️" ;; # 7 PM - Dinner
+            20) EMOJI="📺" ;; # 8 PM
+            21) EMOJI="🌙" ;; # 9 PM
+            22) EMOJI="🌜" ;; # 10 PM
+            23) EMOJI="😴" ;; # 11 PM
+            *) EMOJI="🤖" ;;
+          esac
+          git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "$EMOJI Auto commit - $(date +'%Y-%m-%d %H:%M:%S')" && git push)
